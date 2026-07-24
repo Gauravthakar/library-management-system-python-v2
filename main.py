@@ -1,15 +1,18 @@
 from database.database import create_tables, get_connection
+from modules.book_repository import add_book
 
-create_tables()
-print("Library Management System Started...")
+success = add_book(
+    "B001",
+    "Python Programming",
+    "Gaurav",
+    "Programming",
+    10
+)
 
-# connection = get_connection()
-# cursor = connection.cursor()
+print(success)
 
-# cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+# create_tables()
+# print("Library Management System Started...")
 
-# tables = cursor.fetchall()
 
-# print(tables)
 
-# connection.close()

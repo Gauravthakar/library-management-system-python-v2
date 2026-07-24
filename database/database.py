@@ -7,6 +7,7 @@ DB_PATH = os.path.join(BASE_DIR, "library.db")
 
 def get_connection():
     connection = sqlite3.connect(DB_PATH)
+    connection.execute("PRAGMA foreign_keys = ON")
     return connection
 
 
@@ -26,7 +27,6 @@ def create_tables():
             CHECK(available_quantity <= quantity)
         )
     """)
-    print("Books Table Created")
 
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS members(
@@ -39,8 +39,24 @@ def create_tables():
             is_active INTEGER NOT NULL DEFAULT 1
         )
     """)
-    print("Member Table Created")
-    print(DB_PATH)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS transactions(
+            transaction_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            book_id TEXT NOT NULL,
+            member_id TEXT NOT NULL,
+            issue_date TEXT NOT NULL,
+            due_date TEXT NOT NULL,
+            return_date TEXT,
+            fine REAL DEFAULT 0,
+            status TEXT NOT NULL,
+            FOREIGN KEY(book_id)
+            REFERENCES books(book_id),
+            FOREIGN KEY(member_id)
+            REFERENCES members(member_id),
+            CHECK(status IN ('Issued', 'Returned'))
+        )
+    """)
 
     connection.commit()
     connection.close()
