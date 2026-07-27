@@ -72,3 +72,82 @@ def get_all_books():
 
     finally:
         connection.close()
+
+
+def get_book_by_id(book_id):
+
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    try:
+        cursor.execute(
+            """
+            SELECT *
+            FROM books
+            WHERE book_id = ?
+            AND is_active = 1
+            """,
+            (book_id,)
+        )
+
+        book = cursor.fetchone()
+        return book
+
+    finally:
+        connection.close()
+
+
+def update_book(book_id, title, author, category, quantity):
+
+    book = get_book_by_id(book_id)
+    if book is None:
+        return False
+
+    new_quantity = quantity
+    #Tuple index of Book Table.
+    old_quantity = book[4]
+    old_available_quantity = book[5]
+
+    issued_books = old_quantity - old_available_quantity
+
+    if new_quantity < issued_books:
+        return False
+
+    difference = new_quantity - old_quantity
+
+    new_available_quantity = old_available_quantity + difference
+
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    try:
+        cursor.execute(
+            """
+            UPDATE books
+            SET
+                title = ?,
+                author = ?,
+                category = ?,
+                quantity = ?,
+                available_quantity = ?
+            WHERE book_id = ?
+            """,
+
+            (
+                title,
+                author,
+                category,
+                new_quantity,
+                new_available_quantity,
+                book_id
+            )
+        )
+
+        connection.commit()
+        return True
+
+    except sqlite3.IntegrityError:
+        return False
+
+    finally:
+        connection.close()
