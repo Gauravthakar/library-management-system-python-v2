@@ -1,5 +1,5 @@
 from database.database import create_tables, get_connection
-from modules.book_repository import add_book, get_book_by_id, get_all_books, update_book
+from modules.book_repository import add_book, get_book_by_id, get_all_books, update_book, soft_delete_book
 
 # success = add_book(
 #     "B001",
@@ -20,6 +20,9 @@ from modules.book_repository import add_book, get_book_by_id, get_all_books, upd
 # print(result)
 
 # book = get_book_by_id(book_id="B001")
+# print(book)
+
+# book = soft_delete_book(book_id="B001")
 # print(book)
 
 

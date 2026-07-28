@@ -151,3 +151,30 @@ def update_book(book_id, title, author, category, quantity):
 
     finally:
         connection.close()
+
+
+def soft_delete_book(book_id):
+
+    book = get_book_by_id(book_id)
+    if book is None:
+        return False
+
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    try:
+        cursor.execute(
+            """
+            UPDATE books
+            SET is_active = 0
+            WHERE book_id = ?
+            """,
+            
+            (book_id,)
+        )
+
+        connection.commit()
+        return True
+
+    finally:
+        connection.close()
