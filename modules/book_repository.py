@@ -1,5 +1,7 @@
 from database.database import get_connection
-from datetime import datetime
+from modules.member_repository import get_member_by_id
+from modules.transaction_repository import add_transaction
+from datetime import datetime, timedelta
 import sqlite3
 
 def add_book(book_id, title, author, category, quantity):
@@ -178,3 +180,67 @@ def soft_delete_book(book_id):
 
     finally:
         connection.close()
+
+
+def update_available_quantity(connection, book_id, available_quantity):
+
+    cursor = connection.cursor()
+
+    cursor.execute(
+        """
+        UPDATE books
+        SET available_quantity = ?
+        WHERE book_id = ?
+        """,
+    
+        (
+            available_quantity,
+            book_id
+        )
+    )
+    
+    return True
+
+
+def issue_book(book_id, member_id):
+
+    book = get_book_by_id(book_id)
+    if book is None:
+        return False
+
+    member = get_member_by_id(member_id)
+    if member is None:
+        return False
+
+    available_quantity = book[5]
+    if available_quantity == 0:
+        return False
+
+    new_available_quantity = available_quantity - 1
+
+    issue_date = datetime.now()
+    due_date = issue_date + timedelta(days=7)
+
+    issue_date = issue_date.strftime('%Y-%m-%d')
+    due_date = due_date.strftime('%Y-%m-%d')
+
+    connection = get_connection()
+
+    try:
+
+        update_available_quantity(connection, book_id, new_available_quantity)
+
+        add_transaction(connection, book_id, member_id, issue_date, due_date)
+
+        connection.commit()
+
+    except Exception:
+
+        connection.rollback()
+        return False
+
+    finally:
+
+        connection.close()
+
+    return True

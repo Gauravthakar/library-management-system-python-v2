@@ -13,7 +13,7 @@ from modules.member_repository import *
 
 # print(success)
 
-# member = get_all_members()
+# member = restore_member(member_id="M001")
 # print(member)
 
 # member = get_member_by_id(member_id="M001")
@@ -53,7 +53,7 @@ from modules.member_repository import *
 # book = get_book_by_id(book_id="B001")
 # print(book)
 
-# book = soft_delete_book(book_id="B001")
+# book = restore_book(book_id="B001")
 # print(book)
 
 
