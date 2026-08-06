@@ -1,7 +1,28 @@
 from database.database import create_tables, get_connection
 from modules.book_repository import *
 from modules.member_repository import *
+from modules.transaction_repository import *
 
+
+# connection = get_connection()
+# cursor = connection.cursor()
+
+# cursor.execute("SELECT * FROM transactions")
+
+# print(cursor.fetchall())
+
+# connection.close()
+
+
+
+# result = return_book("B001", "M001")
+# print(result)
+
+# issue = issue_book("B001", "M001")
+# print(issue)
+
+# active = get_active_transaction("B001", "M001")
+# print(active)
 
 # success = add_member(
 #     "M001",

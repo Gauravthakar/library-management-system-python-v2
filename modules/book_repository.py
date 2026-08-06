@@ -1,6 +1,6 @@
 from database.database import get_connection
-from modules.member_repository import get_member_by_id
-from modules.transaction_repository import add_transaction
+from modules.member_repository import *
+from modules.transaction_repository import *
 from datetime import datetime, timedelta
 import sqlite3
 
@@ -244,3 +244,54 @@ def issue_book(book_id, member_id):
         connection.close()
 
     return True
+
+
+def return_book(book_id, member_id):
+
+    transaction = get_active_transaction(book_id, member_id)
+    if transaction is None:
+        return False
+
+    book = get_book_by_id(book_id)
+    if book is None:
+        return False
+
+    available_quantity = book[5]
+
+    return_date = datetime.now()
+    due_date = datetime.strptime(transaction[4], '%Y-%m-%d')
+    fine = calculate_fine(due_date, return_date)
+
+    new_available_quantity = available_quantity + 1
+
+    return_date = return_date.strftime('%Y-%m-%d')
+
+    connection = get_connection()
+
+    try:
+
+        update_available_quantity(connection, book_id, new_available_quantity)
+        update_return_transaction(connection, transaction[0], return_date, fine)
+        connection.commit()
+
+    except Exception:
+
+        connection.rollback()
+        return False
+
+    finally:
+
+        connection.close()
+
+    return True
+
+
+
+def calculate_fine(due_date, return_date):
+
+    late_days = (return_date - due_date).days
+
+    if late_days <= 0:
+        return 0
+
+    return late_days * 10
