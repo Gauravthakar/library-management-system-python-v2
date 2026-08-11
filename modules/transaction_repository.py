@@ -178,16 +178,100 @@ def get_overdue_transactions():
 
         cursor.execute(
             """
-            SELECT *
+            SELECT 
+                books.book_id,
+                books.title,
+                members.member_id,
+                members.name,
+                transactions.issue_date,
+                transactions.due_date,
+                transactions.status
             FROM transactions
-            WHERE status = "Issued"
-            AND due_date < CURRENT_DATE
-            ORDER BY due_date ASC
+            INNER JOIN books
+                ON transactions.book_id = books.book_id
+            INNER JOIN members
+                ON transactions.member_id = members.member_id
+            WHERE transactions.status = "Issued"
+            AND transactions.due_date < CURRENT_DATE
+            ORDER BY transactions.due_date ASC
             """
         )
 
         overdue_transactions = cursor.fetchall()
         return overdue_transactions
+
+    finally:
+
+        connection.close()
+
+
+def get_currently_issued_books():
+
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    try:
+
+        cursor.execute(
+            """
+            SELECT
+                books.book_id,
+                books.title,
+                members.member_id,
+                members.name,
+                transactions.issue_date,
+                transactions.due_date,
+                transactions.status
+            FROM transactions
+            INNER JOIN books
+                ON transactions.book_id = books.book_id
+            INNER JOIN members
+                ON transactions.member_id = members.member_id
+            WHERE transactions.status = "Issued"
+            ORDER BY transactions.due_date ASC
+            """
+        )
+
+        currently_issued = cursor.fetchall()
+        return currently_issued
+
+    finally:
+
+        connection.close()
+
+
+def get_fine_reports():
+
+    connection = get_connection()
+    cursor = connection.cursor()
+
+    try:
+
+        cursor.execute(
+            """
+            SELECT
+                books.book_id,
+                books.title,
+                members.member_id,
+                members.name,
+                transactions.issue_date,
+                transactions.due_date,
+                transactions.return_date,
+                transactions.fine
+            FROM transactions
+            INNER JOIN books
+                ON transactions.book_id = books.book_id
+            INNER JOIN members
+                ON transactions.member_id = members.member_id
+            WHERE transactions.status = "Returned"
+            AND transactions.fine > 0
+            ORDER BY transactions.fine DESC
+            """
+        )
+
+        fine_reports = cursor.fetchall()
+        return fine_reports
+
 
     finally:
 
