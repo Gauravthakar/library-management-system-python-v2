@@ -5,14 +5,14 @@ BASE_DIR = os.path.dirname(__file__)
 
 DB_PATH = os.path.join(BASE_DIR, "library.db")
 
-def get_connection():
-    connection = sqlite3.connect(DB_PATH)
+def get_connection(db_name="library.db"):
+    connection = sqlite3.connect("database/" + db_name)
     connection.execute("PRAGMA foreign_keys = ON")
     return connection
 
 
-def create_tables():
-    connection = get_connection()
+def create_tables(db_name="library.db"):
+    connection = get_connection(db_name)
     cursor = connection.cursor()
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS books(
