@@ -117,9 +117,9 @@ def get_all_transactions():
         connection.close()
 
 
-def get_transactions_by_member(member_id):
+def get_transactions_by_member(member_id, db_name="library.db"):
 
-    connection = get_connection()
+    connection = get_connection(db_name)
     cursor = connection.cursor()
 
     try:
@@ -143,9 +143,9 @@ def get_transactions_by_member(member_id):
         connection.close()
 
 
-def get_transactions_by_book(book_id):
+def get_transactions_by_book(book_id, db_name="library.db"):
 
-    connection = get_connection()
+    connection = get_connection(db_name)
     cursor = connection.cursor()
 
     try:
