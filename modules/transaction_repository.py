@@ -43,9 +43,9 @@ def add_transaction(connection, book_id, member_id, issue_date, due_date):
         return False
 
 
-def get_active_transaction(book_id, member_id):
+def get_active_transaction(book_id, member_id, db_name="library.db"):
 
-    connection = get_connection()
+    connection = get_connection(db_name)
     cursor = connection.cursor()
 
     try:
@@ -91,6 +91,8 @@ def update_return_transaction(connection, transaction_id, return_date, fine):
             transaction_id
         )
     )
+
+    connection.commit()
     
     return True 
 

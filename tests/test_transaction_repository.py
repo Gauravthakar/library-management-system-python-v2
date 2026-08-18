@@ -1,7 +1,9 @@
 from modules.transaction_repository import (
     get_transactions_by_member, 
     get_transactions_by_book,
-    add_transaction
+    add_transaction,
+    get_active_transaction,
+    update_return_transaction
     )
 
 from database.database import create_tables, get_connection
@@ -214,3 +216,136 @@ def test_add_transaction_invalid_member(test_database):
     transaction_count = cursor.fetchone()[0]
 
     assert transaction_count == 0
+
+
+def test_add_transaction_default_values(test_database):
+
+    result = add_transaction(
+        test_database,
+        "B001",
+        "M001",
+        "2026-08-14",
+        "2026-08-21"
+    )
+
+    assert result is True
+
+    cursor = test_database.cursor()
+
+    cursor.execute(
+        """
+        SELECT return_date, fine, status
+        FROM transactions
+        ORDER BY transaction_id DESC
+        LIMIT 1
+        """
+    )
+
+    transaction = cursor.fetchone()
+
+    assert transaction[0] is None
+    assert transaction[1] == 0
+    assert transaction[2] == "Issued"
+
+
+def test_add_transaction_missing_issue_date(test_database):
+
+    result = add_transaction(
+        test_database,
+        "B001",
+        "M001",
+        None,
+        "2026-08-21"
+    )
+
+    assert result is False
+
+    cursor = test_database.cursor()
+
+    cursor.execute(
+        """
+        SELECT COUNT(*)
+        FROM transactions
+        """
+    )
+
+    transaction_count = cursor.fetchone()[0]
+
+    assert transaction_count == 1
+
+
+def test_add_transaction_missing_due_date(test_database):
+
+    result = add_transaction(
+        test_database,
+        "B001",
+        "M001",
+        "2026-08-14",
+        None
+    )
+
+    assert result is False
+
+    cursor = test_database.cursor()
+
+    cursor.execute(
+        """
+        SELECT COUNT(*)
+        FROM transactions
+        """
+    )
+
+    transaction_count = cursor.fetchone()[0]
+
+    assert transaction_count == 1
+
+
+def test_get_active_transaction(test_database):
+
+    transaction = get_active_transaction(
+        "B001",
+        "M001",
+        "library_test.db"
+    )
+
+    assert transaction is not None
+    assert transaction[1] == "B001"
+    assert transaction[2] == "M001"
+    assert transaction[7] == "Issued"
+
+
+def test_get_active_transaction_not_found(test_database):
+
+    transaction = get_active_transaction(
+        "B001",
+        "M999",
+        "library_test.db"
+    )
+
+    assert transaction is None
+
+
+def test_get_active_transaction_returned(test_database):
+
+    transaction = get_active_transaction(
+        "B001",
+        "M001",
+        "library_test.db"
+    )
+
+    transaction_id = transaction[0]
+
+    update_return_transaction(
+        test_database,
+        transaction_id,
+        "2026-08-14",
+        10
+    )
+
+    active_transaction = get_active_transaction(
+        "B001",
+        "M001",
+        "library_test.db"
+    )
+
+    assert active_transaction is None
