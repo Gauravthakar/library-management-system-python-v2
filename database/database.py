@@ -48,7 +48,7 @@ def create_tables(db_name="library.db"):
             issue_date TEXT NOT NULL,
             due_date TEXT NOT NULL,
             return_date TEXT,
-            fine REAL DEFAULT 0,
+            fine REAL DEFAULT 0 CHECK(fine >= 0),
             status TEXT NOT NULL,
             FOREIGN KEY(book_id)
             REFERENCES books(book_id),

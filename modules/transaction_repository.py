@@ -75,6 +75,9 @@ def update_return_transaction(connection, transaction_id, return_date, fine):
 
     cursor = connection.cursor()
 
+    if fine < 0:
+        return False
+
     cursor.execute(
         """
         UPDATE transactions
@@ -92,14 +95,17 @@ def update_return_transaction(connection, transaction_id, return_date, fine):
         )
     )
 
+    if cursor.rowcount == 0:
+        return False
+
     connection.commit()
     
     return True 
 
 
-def get_all_transactions():
+def get_all_transactions(db_name="library.db"):
 
-    connection = get_connection()
+    connection = get_connection(db_name)
     cursor = connection.cursor()
 
     try:
@@ -171,9 +177,9 @@ def get_transactions_by_book(book_id, db_name="library.db"):
         connection.close()
 
 
-def get_overdue_transactions():
+def get_overdue_transactions(db_name="library.db"):
 
-    connection = get_connection()
+    connection = get_connection(db_name)
     cursor = connection.cursor()
 
     try:
