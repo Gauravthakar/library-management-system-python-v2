@@ -4,13 +4,13 @@ from modules.transaction_repository import *
 from datetime import datetime, timedelta
 import sqlite3
 
-def add_book(book_id, title, author, category, quantity):
+def add_book(book_id, title, author, category, quantity, db_name="library.db"):
 
     available_quantity = quantity
     created_at = datetime.now().strftime("%Y-%m-%d")
     is_active = 1
 
-    connection = get_connection()
+    connection = get_connection(db_name)
     cursor = connection.cursor()
 
     try:

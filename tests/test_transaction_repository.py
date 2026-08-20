@@ -5,7 +5,9 @@ from modules.transaction_repository import (
     get_active_transaction,
     update_return_transaction,
     get_all_transactions,
-    get_overdue_transactions
+    get_overdue_transactions,
+    get_currently_issued_books,
+    get_fine_reports
     )
 
 from database.database import create_tables, get_connection
@@ -845,3 +847,276 @@ def test_get_overdue_transactions_order(test_database):
     assert len(overdue_transactions) == 2
     assert overdue_transactions[0][5] == "2026-08-10"
     assert overdue_transactions[1][5] == "2026-08-12"
+
+
+def test_get_currently_issued_books(test_database):
+
+    currently_issued = get_currently_issued_books(
+        "library_test.db"
+    )
+
+    assert len(currently_issued) == 1
+    assert currently_issued[0][0] == "B001"
+    assert currently_issued[0][1] == "Python Basics"
+    assert currently_issued[0][2] == "M001"
+    assert currently_issued[0][3] == "Test Member"
+    assert currently_issued[0][6] == "Issued"
+
+
+def test_get_currently_issued_books_excludes_returned(test_database):
+
+    cursor = test_database.cursor()
+
+    cursor.execute(
+        """
+        UPDATE transactions
+        SET status = 'Returned',
+            return_date = '2026-08-14'
+        WHERE transaction_id = 1
+        """
+    )
+
+    test_database.commit()
+
+    currently_issued = get_currently_issued_books(
+        "library_test.db"
+    )
+
+    assert currently_issued == []
+
+
+def test_get_currently_issued_books_includes_future_due_date(test_database):
+
+    cursor = test_database.cursor()
+
+    cursor.execute(
+        """
+        UPDATE transactions
+        SET status = 'Issued',
+            due_date = '2099-12-31',
+            return_date = NULL
+        WHERE transaction_id = 1
+        """
+    )
+
+    test_database.commit()
+
+    currently_issued = get_currently_issued_books(
+        "library_test.db"
+    )
+
+    assert len(currently_issued) == 1
+    assert currently_issued[0][0] == "B001"
+    assert currently_issued[0][5] == "2099-12-31"
+    assert currently_issued[0][6] == "Issued"
+
+
+def test_get_currently_issued_books_order(test_database):
+
+    cursor = test_database.cursor()
+
+    cursor.execute(
+        """
+        UPDATE transactions
+        SET due_date = '2026-08-25'
+        WHERE transaction_id = 1
+        """
+    )
+
+    cursor.execute(
+        """
+        INSERT INTO transactions (
+            book_id,
+            member_id,
+            issue_date,
+            due_date,
+            return_date,
+            fine,
+            status
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+        """,
+        (
+            "B001",
+            "M001",
+            "2026-08-16",
+            "2026-08-20",
+            None,
+            0,
+            "Issued"
+        )
+    )
+
+    test_database.commit()
+
+    currently_issued = get_currently_issued_books(
+        "library_test.db"
+    )
+
+    assert len(currently_issued) == 2
+    assert currently_issued[0][5] == "2026-08-20"
+    assert currently_issued[1][5] == "2026-08-25"
+
+
+def test_get_currently_issued_books_empty(test_database):
+
+    cursor = test_database.cursor()
+
+    cursor.execute(
+        """
+        DELETE FROM transactions
+        """
+    )
+
+    test_database.commit()
+
+    currently_issued = get_currently_issued_books(
+        "library_test.db"
+    )
+
+    assert currently_issued == []
+
+
+def test_get_fine_reports(test_database):
+
+    cursor = test_database.cursor()
+
+    cursor.execute(
+        """
+        UPDATE transactions
+        SET status = 'Returned',
+            return_date = '2026-08-14',
+            fine = 10
+        WHERE transaction_id = 1
+        """
+    )
+
+    test_database.commit()
+
+    fine_reports = get_fine_reports(
+        "library_test.db"
+    )
+
+    assert len(fine_reports) == 1
+    assert fine_reports[0][0] == "B001"
+    assert fine_reports[0][1] == "Python Basics"
+    assert fine_reports[0][2] == "M001"
+    assert fine_reports[0][3] == "Test Member"
+    assert fine_reports[0][7] == 10
+
+
+def test_get_fine_reports_excludes_issued(test_database):
+
+    cursor = test_database.cursor()
+
+    cursor.execute(
+        """
+        UPDATE transactions
+        SET status = 'Issued',
+            return_date = NULL,
+            fine = 10
+        WHERE transaction_id = 1
+        """
+    )
+
+    test_database.commit()
+
+    fine_reports = get_fine_reports(
+        "library_test.db"
+    )
+
+    assert fine_reports == []
+
+
+def test_get_fine_reports_excludes_zero_fine(test_database):
+
+    cursor = test_database.cursor()
+
+    cursor.execute(
+        """
+        UPDATE transactions
+        SET status = 'Returned',
+            return_date = '2026-08-14',
+            fine = 0
+        WHERE transaction_id = 1
+        """
+    )
+
+    test_database.commit()
+
+    fine_reports = get_fine_reports(
+        "library_test.db"
+    )
+
+    assert fine_reports == []
+
+
+def test_get_fine_reports_order(test_database):
+
+    cursor = test_database.cursor()
+
+    cursor.execute(
+        """
+        INSERT INTO transactions (
+            book_id,
+            member_id,
+            issue_date,
+            due_date,
+            return_date,
+            fine,
+            status
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+        """,
+        (
+            "B001",
+            "M001",
+            "2026-08-10",
+            "2026-08-12",
+            "2026-08-14",
+            25,
+            "Returned"
+        )
+    )
+
+    cursor.execute(
+        """
+        UPDATE transactions
+        SET status = 'Returned',
+            return_date = '2026-08-14',
+            fine = 10
+        WHERE transaction_id = 1
+        """
+    )
+
+    test_database.commit()
+
+    fine_reports = get_fine_reports(
+        "library_test.db"
+    )
+
+    assert len(fine_reports) == 2
+    assert fine_reports[0][7] == 25
+    assert fine_reports[1][7] == 10
+
+
+def test_get_fine_reports_empty(test_database):
+
+    cursor = test_database.cursor()
+
+    cursor.execute(
+        """
+        UPDATE transactions
+        SET status = 'Returned',
+            return_date = '2026-08-14',
+            fine = 0
+        """
+    )
+
+    test_database.commit()
+
+    fine_reports = get_fine_reports(
+        "library_test.db"
+    )
+
+    assert fine_reports == []

@@ -213,9 +213,9 @@ def get_overdue_transactions(db_name="library.db"):
         connection.close()
 
 
-def get_currently_issued_books():
+def get_currently_issued_books(db_name="library.db"):
 
-    connection = get_connection()
+    connection = get_connection(db_name)
     cursor = connection.cursor()
 
     try:
@@ -248,9 +248,9 @@ def get_currently_issued_books():
         connection.close()
 
 
-def get_fine_reports():
+def get_fine_reports(db_name="library.db"):
 
-    connection = get_connection()
+    connection = get_connection(db_name)
     cursor = connection.cursor()
 
     try:
