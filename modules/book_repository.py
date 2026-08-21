@@ -53,9 +53,9 @@ def add_book(book_id, title, author, category, quantity, db_name="library.db"):
         connection.close()
 
 
-def get_all_books():
+def get_all_books(db_name="library.db"):
 
-    connection = get_connection()
+    connection = get_connection(db_name)
     cursor = connection.cursor()
 
     try:
@@ -76,9 +76,9 @@ def get_all_books():
         connection.close()
 
 
-def get_book_by_id(book_id):
+def get_book_by_id(book_id, db_name="library.db"):
 
-    connection = get_connection()
+    connection = get_connection(db_name)
     cursor = connection.cursor()
 
     try:
@@ -99,9 +99,9 @@ def get_book_by_id(book_id):
         connection.close()
 
 
-def update_book(book_id, title, author, category, quantity):
+def update_book(book_id, title, author, category, quantity, db_name="library.db"):
 
-    book = get_book_by_id(book_id)
+    book = get_book_by_id(book_id, db_name)
     if book is None:
         return False
 
@@ -119,7 +119,7 @@ def update_book(book_id, title, author, category, quantity):
 
     new_available_quantity = old_available_quantity + difference
 
-    connection = get_connection()
+    connection = get_connection(db_name)
     cursor = connection.cursor()
 
     try:
@@ -155,13 +155,13 @@ def update_book(book_id, title, author, category, quantity):
         connection.close()
 
 
-def soft_delete_book(book_id):
+def soft_delete_book(book_id, db_name="library.db"):
 
-    book = get_book_by_id(book_id)
+    book = get_book_by_id(book_id, db_name)
     if book is None:
         return False
 
-    connection = get_connection()
+    connection = get_connection(db_name)
     cursor = connection.cursor()
 
     try:
@@ -202,13 +202,13 @@ def update_available_quantity(connection, book_id, available_quantity):
     return True
 
 
-def issue_book(book_id, member_id):
+def issue_book(book_id, member_id, db_name="library.db"):
 
-    book = get_book_by_id(book_id)
+    book = get_book_by_id(book_id, db_name)
     if book is None:
         return False
 
-    member = get_member_by_id(member_id)
+    member = get_member_by_id(member_id, db_name)
     if member is None:
         return False
 
@@ -224,7 +224,7 @@ def issue_book(book_id, member_id):
     issue_date = issue_date.strftime('%Y-%m-%d')
     due_date = due_date.strftime('%Y-%m-%d')
 
-    connection = get_connection()
+    connection = get_connection(db_name)
 
     try:
 
@@ -246,13 +246,13 @@ def issue_book(book_id, member_id):
     return True
 
 
-def return_book(book_id, member_id):
+def return_book(book_id, member_id, db_name="library.db"):
 
-    transaction = get_active_transaction(book_id, member_id)
+    transaction = get_active_transaction(book_id, member_id, db_name)
     if transaction is None:
         return False
 
-    book = get_book_by_id(book_id)
+    book = get_book_by_id(book_id, db_name)
     if book is None:
         return False
 
@@ -266,7 +266,7 @@ def return_book(book_id, member_id):
 
     return_date = return_date.strftime('%Y-%m-%d')
 
-    connection = get_connection()
+    connection = get_connection(db_name)
 
     try:
 
