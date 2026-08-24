@@ -99,6 +99,28 @@ def get_book_by_id(book_id, db_name="library.db"):
         connection.close()
 
 
+def get_book_by_id_including_inactive(book_id, db_name="library.db"):
+
+    connection = get_connection(db_name)
+    cursor = connection.cursor()
+
+    try:
+        cursor.execute(
+            """
+            SELECT *
+            FROM books
+            WHERE book_id = ?
+            """,
+            (book_id,)
+        )
+
+        book = cursor.fetchone()
+        return book
+
+    finally:
+        connection.close()
+
+
 def update_book(book_id, title, author, category, quantity, db_name="library.db"):
 
     book = get_book_by_id(book_id, db_name)
@@ -252,7 +274,7 @@ def return_book(book_id, member_id, db_name="library.db"):
     if transaction is None:
         return False
 
-    book = get_book_by_id(book_id, db_name)
+    book = get_book_by_id_including_inactive(book_id, db_name)
     if book is None:
         return False
 

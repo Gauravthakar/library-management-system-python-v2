@@ -69,9 +69,9 @@ def get_all_members():
         connection.close()
 
 
-def get_member_by_id(member_id):
+def get_member_by_id(member_id, db_name="library.db"):
 
-    connection = get_connection()
+    connection = get_connection(db_name)
     cursor = connection.cursor()
 
     try:

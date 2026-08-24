@@ -849,6 +849,27 @@ def test_get_overdue_transactions_order(test_database):
     assert overdue_transactions[1][5] == "2026-08-12"
 
 
+def test_get_overdue_transactions_empty(test_database):
+
+    cursor = test_database.cursor()
+
+    cursor.execute(
+        """
+        UPDATE transactions
+        SET due_date = '2099-12-31'
+        WHERE transaction_id = 1
+        """
+    )
+
+    test_database.commit()
+
+    overdue_transactions = get_overdue_transactions(
+        "library_test.db"
+    )
+
+    assert overdue_transactions == []
+
+
 def test_get_currently_issued_books(test_database):
 
     currently_issued = get_currently_issued_books(
