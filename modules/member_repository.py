@@ -2,12 +2,12 @@ from database.database import get_connection
 from datetime import datetime
 import sqlite3
 
-def add_member(member_id, name, phone, email, address):
+def add_member(member_id, name, phone, email, address, db_name="library.db"):
 
     join_date = datetime.now().strftime("%Y-%m-%d")
     is_active = 1
 
-    connection = get_connection()
+    connection = get_connection(db_name)
     cursor = connection.cursor()
 
     try:
@@ -47,9 +47,9 @@ def add_member(member_id, name, phone, email, address):
         connection.close()
 
 
-def get_all_members():
+def get_all_members(db_name="library.db"):
 
-    connection = get_connection()
+    connection = get_connection(db_name)
     cursor = connection.cursor()
 
     try:
@@ -93,13 +93,13 @@ def get_member_by_id(member_id, db_name="library.db"):
         connection.close()
 
 
-def update_member(member_id, name, phone, email, address):
+def update_member(member_id, name, phone, email, address, db_name="library.db"):
 
-    member = get_member_by_id(member_id)
+    member = get_member_by_id(member_id, db_name)
     if member is None:
         return False
 
-    connection = get_connection()
+    connection = get_connection(db_name)
     cursor = connection.cursor()
 
     try:
@@ -130,13 +130,13 @@ def update_member(member_id, name, phone, email, address):
         connection.close()
 
 
-def soft_delete_member(member_id):
+def soft_delete_member(member_id, db_name="library.db"):
 
-    member = get_member_by_id(member_id)
+    member = get_member_by_id(member_id, db_name)
     if member is None:
         return False
 
-    connection = get_connection()
+    connection = get_connection(db_name)
     cursor = connection.cursor()
 
     try:

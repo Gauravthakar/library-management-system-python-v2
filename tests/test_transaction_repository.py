@@ -305,6 +305,33 @@ def test_add_transaction_missing_due_date(test_database):
     assert transaction_count == 1
 
 
+def test_add_transaction_integrity_error(test_database, monkeypatch):
+
+    class FakeCursor:
+
+        def execute(self, *args, **kwargs):
+            raise sqlite3.IntegrityError(
+                "Simulated database error"
+            )
+
+    class FakeConnection:
+
+        def cursor(self):
+            return FakeCursor()
+
+    fake_connection = FakeConnection()
+
+    result = add_transaction(
+        fake_connection,
+        "B001",
+        "M001",
+        "2026-08-24",
+        "2026-08-31"
+    )
+
+    assert result is False
+
+
 def test_get_active_transaction(test_database):
 
     transaction = get_active_transaction(
@@ -324,6 +351,17 @@ def test_get_active_transaction_not_found(test_database):
     transaction = get_active_transaction(
         "B001",
         "M999",
+        "library_test.db"
+    )
+
+    assert transaction is None
+
+
+def test_get_active_transaction_book_not_found(test_database):
+
+    transaction = get_active_transaction(
+        "B999",
+        "M001",
         "library_test.db"
     )
 
@@ -1141,3 +1179,149 @@ def test_get_fine_reports_empty(test_database):
     )
 
     assert fine_reports == []
+
+
+def test_update_return_transaction_integrity_error(test_database, monkeypatch):
+
+    class FakeCursor:
+
+        def execute(self, *args, **kwargs):
+            raise sqlite3.IntegrityError(
+                "Simulated database error"
+            )
+
+        @property
+        def rowcount(self):
+            return 1
+
+    class FakeConnection:
+
+        def cursor(self):
+            return FakeCursor()
+
+        def commit(self):
+            pass
+
+    fake_connection = FakeConnection()
+
+    with pytest.raises(sqlite3.IntegrityError):
+
+        update_return_transaction(
+            fake_connection,
+            1,
+            "2026-08-24",
+            10
+        )
+
+
+def test_update_return_transaction_missing_return_date(test_database):
+
+    result = update_return_transaction(
+        test_database,
+        1,
+        None,
+        10
+    )
+
+    assert result is True
+
+    cursor = test_database.cursor()
+
+    cursor.execute(
+        """
+        SELECT return_date, fine, status
+        FROM transactions
+        WHERE transaction_id = ?
+        """,
+        (1,)
+    )
+
+    transaction = cursor.fetchone()
+
+    assert transaction[0] is None
+    assert transaction[1] == 10
+    assert transaction[2] == "Returned"
+
+
+def test_get_transactions_by_member_includes_returned(test_database):
+
+    cursor = test_database.cursor()
+
+    cursor.execute(
+        """
+        UPDATE transactions
+        SET
+            return_date = '2026-08-14',
+            fine = 10,
+            status = 'Returned'
+        WHERE transaction_id = 1
+        """
+    )
+
+    test_database.commit()
+
+    transactions = get_transactions_by_member(
+        "M001",
+        "library_test.db"
+    )
+
+    assert len(transactions) == 1
+    assert transactions[0][2] == "M001"
+    assert transactions[0][7] == "Returned"
+    assert transactions[0][6] == 10
+
+
+def test_get_transactions_by_book_includes_returned(test_database):
+
+    cursor = test_database.cursor()
+
+    cursor.execute(
+        """
+        UPDATE transactions
+        SET
+            return_date = '2026-08-14',
+            fine = 10,
+            status = 'Returned'
+        WHERE transaction_id = 1
+        """
+    )
+
+    test_database.commit()
+
+    transactions = get_transactions_by_book(
+        "B001",
+        "library_test.db"
+    )
+
+    assert len(transactions) == 1
+    assert transactions[0][1] == "B001"
+    assert transactions[0][7] == "Returned"
+    assert transactions[0][6] == 10
+
+
+def test_get_all_transactions_includes_returned(test_database):
+
+    cursor = test_database.cursor()
+
+    cursor.execute(
+        """
+        UPDATE transactions
+        SET
+            return_date = '2026-08-14',
+            fine = 10,
+            status = 'Returned'
+        WHERE transaction_id = 1
+        """
+    )
+
+    test_database.commit()
+
+    transactions = get_all_transactions(
+        "library_test.db"
+    )
+
+    assert len(transactions) == 1
+    assert transactions[0][1] == "B001"
+    assert transactions[0][2] == "M001"
+    assert transactions[0][7] == "Returned"
+    assert transactions[0][6] == 10
