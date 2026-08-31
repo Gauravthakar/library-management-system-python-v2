@@ -333,6 +333,175 @@ def member_menu():
             print("Invalid choice. Please try again.")
 
 # ========= Transaction Section ===========
+
+def issue_book_menu():
+
+    print("\n===== Issue Book =====")
+
+    book_id = input("Enter Book ID: ")
+    member_id = input("Enter Member ID: ")
+
+    result = issue_book_to_member(book_id, member_id)
+
+    if result:
+        print("Book issued successfully.")
+    else:
+        print("Failed to issue book.")
+
+
+def return_book_menu():
+
+    print("\n===== Return Book =====")
+
+    book_id = input("Enter Book ID: ")
+    member_id = input("Enter Member ID: ")
+
+    result = return_book_from_member(
+        book_id,
+        member_id
+    )
+
+    if result:
+        print("Book returned successfully.")
+    else:
+        print("Failed to return book.")
+
+
+def view_transactions():
+
+    transactions = get_transactions()
+
+    if not transactions:
+        print("\nNo transactions found.")
+        return
+
+    print("\n===== All Transactions =====")
+
+    for transaction in transactions:
+        print(
+            f"ID: {transaction[0]} | "
+            f"Book ID: {transaction[1]} | "
+            f"Member ID: {transaction[2]} | "
+            f"Issue Date: {transaction[3]} | "
+            f"Due Date: {transaction[4]} | "
+            f"Return Date: {transaction[5]} | "
+            f"Fine: {transaction[6]} | "
+            f"Status: {transaction[7]}"
+        )
+
+
+def member_transaction_history():
+
+    print("\n===== Member Transaction History =====")
+
+    member_id = input("Enter Member ID: ")
+
+    transactions = get_member_transactions(member_id)
+
+    if not transactions:
+        print("No transactions found for this member.")
+        return
+
+    for transaction in transactions:
+        print(
+            f"ID: {transaction[0]} | "
+            f"Book ID: {transaction[1]} | "
+            f"Member ID: {transaction[2]} | "
+            f"Issue Date: {transaction[3]} | "
+            f"Due Date: {transaction[4]} | "
+            f"Return Date: {transaction[5]} | "
+            f"Fine: {transaction[6]} | "
+            f"Status: {transaction[7]}"
+        )
+
+
+def book_transaction_history():
+
+    print("\n===== Book Transaction History =====")
+
+    book_id = input("Enter Book ID: ")
+
+    transactions = get_book_transactions(book_id)
+
+    if not transactions:
+        print("No transactions found for this book.")
+        return
+
+    for transaction in transactions:
+        print(
+            f"ID: {transaction[0]} | "
+            f"Book ID: {transaction[1]} | "
+            f"Member ID: {transaction[2]} | "
+            f"Issue Date: {transaction[3]} | "
+            f"Due Date: {transaction[4]} | "
+            f"Return Date: {transaction[5]} | "
+            f"Fine: {transaction[6]} | "
+            f"Status: {transaction[7]}"
+        )
+
+
+def overdue_books_menu():
+
+    print("\n===== Overdue Books =====")
+
+    transactions = get_overdue_books()
+
+    if not transactions:
+        print("No overdue books found.")
+        return
+
+    for transaction in transactions:
+        print(
+            f"ID: {transaction[0]} | "
+            f"Book ID: {transaction[1]} | "
+            f"Member ID: {transaction[2]} | "
+            f"Issue Date: {transaction[3]} | "
+            f"Due Date: {transaction[4]} | "
+            f"Return Date: {transaction[5]} | "
+            f"Fine: {transaction[6]} | "
+            f"Status: {transaction[7]}"
+        )
+
+
+def currently_issued_books_menu():
+
+    print("\n===== Currently Issued Books =====")
+
+    transactions = get_currently_issued()
+
+    if not transactions:
+        print("No books are currently issued.")
+        return
+
+    for transaction in transactions:
+        print(
+            f"ID: {transaction[0]} | "
+            f"Book ID: {transaction[1]} | "
+            f"Member ID: {transaction[2]} | "
+            f"Issue Date: {transaction[3]} | "
+            f"Due Date: {transaction[4]} | "
+            f"Status: {transaction[7]}"
+        )
+
+
+def fine_reports_menu():
+
+    print("\n===== Fine Reports =====")
+
+    reports = get_fine_report()
+
+    if not reports:
+        print("No fine records found.")
+        return
+
+    for report in reports:
+        print(
+            f"Transaction ID: {report[0]} | "
+            f"Book ID: {report[1]} | "
+            f"Member ID: {report[2]} | "
+            f"Fine: ₹{report[3]}"
+        )
+
 def transaction_menu():
 
     while True:
@@ -351,28 +520,28 @@ def transaction_menu():
         choice = input("Enter your choice: ")
 
         if choice == "1":
-            print("Issue Book")
+            issue_book_menu()
 
         elif choice == "2":
-            print("Return Book")
+            return_book_menu()
 
         elif choice == "3":
-            print("View All Transactions")
+            view_transactions()
 
         elif choice == "4":
-            print("Member Transaction History")
+            member_transaction_history()
 
         elif choice == "5":
-            print("Book Transaction History")
+            book_transaction_history()
 
         elif choice == "6":
-            print("Overdue Books")
+            overdue_books_menu()
 
         elif choice == "7":
-            print("Currently Issued Books")
+            currently_issued_books_menu()
 
         elif choice == "8":
-            print("Fine Reports")
+            fine_reports_menu()
 
         elif choice == "9":
             break
