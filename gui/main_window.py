@@ -10,7 +10,19 @@ from services.book_service import(
 from services.member_service import(
     create_member,
     get_members,
-    get_member
+    get_member,
+    update_member,
+    delete_member
+)
+from services.transaction_service import(
+    issue_book_to_member,
+    return_book_from_member,
+    get_transactions,
+    get_member_transactions,
+    get_book_transactions,
+    get_overdue_books,
+    get_currently_issued,
+    get_fine_report
 )
 
 # ========= Books Section ==========
@@ -808,6 +820,196 @@ def open_search_member():
 
     search_button.pack(pady=20)
 
+
+# Update Member
+def open_update_member():
+
+    update_window = tk.Toplevel()
+    update_window.title("Update Member")
+    update_window.geometry("500x600")
+
+    title_label = tk.Label(
+        update_window,
+        text="Update Member",
+        font=("Arial", 20, "bold")
+    )
+    title_label.pack(pady=20)
+
+    member_id_label = tk.Label(
+        update_window,
+        text="Member ID"
+    )
+    member_id_label.pack(pady=5)
+
+    member_id_entry = tk.Entry(
+        update_window,
+        width=35
+    )
+    member_id_entry.pack(pady=5)
+
+    def search_member():
+
+        member_id = member_id_entry.get()
+
+        member = get_member(member_id)
+
+        if member:
+
+            name_entry.delete(0, tk.END)
+            name_entry.insert(0, member[1])
+
+            phone_entry.delete(0, tk.END)
+            phone_entry.insert(0, member[2])
+
+            email_entry.delete(0, tk.END)
+            email_entry.insert(0, member[3])
+
+            address_entry.delete(0, tk.END)
+            address_entry.insert(0, member[4])
+
+        else:
+
+            print("Member not found.")
+
+    search_button = tk.Button(
+        update_window,
+        text="Search Member",
+        width=20,
+        command=search_member
+    )
+    search_button.pack(pady=15)
+
+    name_label = tk.Label(
+        update_window,
+        text="Name"
+    )
+    name_label.pack(pady=5)
+
+    name_entry = tk.Entry(
+        update_window,
+        width=35
+    )
+    name_entry.pack(pady=5)
+
+
+    phone_label = tk.Label(
+        update_window,
+        text="Phone"
+    )
+    phone_label.pack(pady=5)
+
+    phone_entry = tk.Entry(
+        update_window,
+        width=35
+    )
+    phone_entry.pack(pady=5)
+
+
+    email_label = tk.Label(
+        update_window,
+        text="Email"
+    )
+    email_label.pack(pady=5)
+
+    email_entry = tk.Entry(
+        update_window,
+        width=35
+)
+    email_entry.pack(pady=5)
+
+
+    address_label = tk.Label(
+        update_window,
+        text="Address"
+    )
+    address_label.pack(pady=5)
+
+    address_entry = tk.Entry(
+        update_window,
+        width=35
+    )
+    address_entry.pack(pady=5)
+
+    def save_updated_member():
+
+        member_id = member_id_entry.get()
+        name = name_entry.get()
+        phone = phone_entry.get()
+        email = email_entry.get()
+        address = address_entry.get()
+
+        result = update_member(
+            member_id,
+            name,
+            phone,
+            email,
+            address
+        )
+
+        if result:
+            print("Member updated successfully.")
+            update_window.destroy()
+        else:
+            print("Failed to update member.")
+
+    update_button = tk.Button(
+        update_window,
+        text="Update Member",
+        width=25,
+        height=2,
+        command=save_updated_member
+    )
+
+    update_button.pack(pady=20)
+
+
+# Delete Member
+def open_delete_member():
+
+    delete_window = tk.Toplevel()
+    delete_window.title("Delete Member")
+    delete_window.geometry("500x300")
+
+    title_label = tk.Label(
+        delete_window,
+        text="Delete Member",
+        font=("Arial", 20, "bold")
+    )
+    title_label.pack(pady=20)
+
+    member_id_label = tk.Label(
+        delete_window,
+        text="Member ID"
+    )
+    member_id_label.pack(pady=5)
+
+    member_id_entry = tk.Entry(
+        delete_window,
+        width=35
+    )
+    member_id_entry.pack(pady=5)
+
+    def delete_selected_member():
+
+        member_id = member_id_entry.get()
+
+        result = delete_member(member_id)
+
+        if result:
+            print("Member deleted successfully.")
+            delete_window.destroy()
+        else:
+            print("Failed to delete member.")
+
+    delete_button = tk.Button(
+        delete_window,
+        text="Delete Member",
+        width=25,
+        height=2,
+        command=delete_selected_member
+    )
+    delete_button.pack(pady=20)
+
 def open_member_management():
 
     member_window = tk.Toplevel()
@@ -857,7 +1059,8 @@ def open_member_management():
         member_window,
         text="Update Member",
         width=25,
-        height=2
+        height=2,
+        command=open_update_member
     )
 
     update_button.pack(pady=10)
@@ -866,7 +1069,8 @@ def open_member_management():
         member_window,
         text="Delete Member",
         width=25,
-        height=2
+        height=2,
+        command=open_delete_member
     )
 
     delete_button.pack(pady=10)
@@ -880,6 +1084,305 @@ def open_member_management():
     )
 
     close_button.pack(pady=10)
+
+
+# ============ Transaction Section =============
+def open_issue_book():
+
+    issue_window = tk.Toplevel()
+    issue_window.title("Issue Book")
+    issue_window.geometry("500x450")
+
+    title_label = tk.Label(
+        issue_window,
+        text="Issue Book",
+        font=("Arial", 20, "bold")
+    )
+    title_label.pack(pady=20)
+
+    book_id_label = tk.Label(
+        issue_window,
+        text="Book ID"
+    )
+    book_id_label.pack(pady=5)
+
+    book_id_entry = tk.Entry(
+        issue_window,
+        width=35
+    )
+    book_id_entry.pack(pady=5)
+
+
+    member_id_label = tk.Label(
+        issue_window,
+        text="Member ID"
+    )
+    member_id_label.pack(pady=5)
+
+    member_id_entry = tk.Entry(
+        issue_window,
+        width=35
+    )
+    member_id_entry.pack(pady=5)
+
+    def issue_selected_book():
+
+        book_id = book_id_entry.get()
+        member_id = member_id_entry.get()
+
+        result = issue_book_to_member(
+            book_id,
+            member_id
+        )
+
+        if result:
+            print("Book issued successfully.")
+            issue_window.destroy()
+        else:
+            print("Failed to issue book.")
+
+    issue_button = tk.Button(
+        issue_window,
+        text="Issue Book",
+        width=25,
+        height=2,
+        command=issue_selected_book
+    )
+
+    issue_button.pack(pady=20)
+
+def open_return_book():
+
+    return_window = tk.Toplevel()
+    return_window.title("Return Book")
+    return_window.geometry("500x450")
+
+    title_label = tk.Label(
+        return_window,
+        text="Return Book",
+        font=("Arial", 20, "bold")
+    )
+    title_label.pack(pady=20)
+
+    book_id_label = tk.Label(
+        return_window,
+        text="Book ID"
+    )
+    book_id_label.pack(pady=5)
+
+    book_id_entry = tk.Entry(
+        return_window,
+        width=35
+    )
+    book_id_entry.pack(pady=5)
+
+
+    member_id_label = tk.Label(
+        return_window,
+        text="Member ID"
+    )
+    member_id_label.pack(pady=5)
+
+    member_id_entry = tk.Entry(
+        return_window,
+        width=35
+    )
+    member_id_entry.pack(pady=5)
+
+    def return_selected_book():
+
+        book_id = book_id_entry.get()
+        member_id = member_id_entry.get()
+
+        result = return_book_from_member(
+            book_id,
+            member_id
+        )
+
+        if result:
+            print("Book returned successfully.")
+            return_window.destroy()
+        else:
+            print("Failed to return book.")
+
+    return_button = tk.Button(
+        return_window,
+        text="Return Book",
+        width=25,
+        height=2,
+        command=return_selected_book
+    )
+
+    return_button.pack(pady=20)
+
+def open_view_transactions():
+
+    view_window = tk.Toplevel()
+    view_window.title("View All Transactions")
+    view_window.geometry("1000x500")
+
+    title_label = tk.Label(
+        view_window,
+        text="All Transactions",
+        font=("Arial", 20, "bold")
+    )
+    title_label.pack(pady=20)
+
+    transactions = get_transactions()
+
+    tree = ttk.Treeview(
+        view_window,
+        columns=(
+            "id",
+            "book_id",
+            "member_id",
+            "issue_date",
+            "due_date",
+            "return_date",
+            "fine",
+            "status"
+        ),
+        show="headings"
+    )
+
+    tree.heading("id", text="Transaction ID")
+    tree.heading("book_id", text="Book ID")
+    tree.heading("member_id", text="Member ID")
+    tree.heading("issue_date", text="Issue Date")
+    tree.heading("due_date", text="Due Date")
+    tree.heading("return_date", text="Return Date")
+    tree.heading("fine", text="Fine")
+    tree.heading("status", text="Status")
+
+    tree.column("id", width=100)
+    tree.column("book_id", width=100)
+    tree.column("member_id", width=100)
+    tree.column("issue_date", width=110)
+    tree.column("due_date", width=110)
+    tree.column("return_date", width=110)
+    tree.column("fine", width=80)
+    tree.column("status", width=100)
+
+    tree.pack(
+        fill="both",
+        expand=True,
+        padx=20,
+        pady=10
+    )
+
+    for transaction in transactions:
+
+        tree.insert(
+            "",
+            tk.END,
+            values=(
+                transaction[0],
+                transaction[1],
+                transaction[2],
+                transaction[3],
+                transaction[4],
+                transaction[5],
+                transaction[6],
+                transaction[7]
+            )
+        )
+
+
+def open_transaction_management():
+
+    transaction_window = tk.Toplevel()
+    transaction_window.title("Transaction Management")
+    transaction_window.geometry("700x600")
+
+    title_label = tk.Label(
+        transaction_window,
+        text="Transaction Management",
+        font=("Arial", 20, "bold")
+    )
+    title_label.pack(pady=20)
+
+    issue_button = tk.Button(
+        transaction_window,
+        text="Issue Book",
+        width=30,
+        height=2,
+        command=open_issue_book
+    )
+    issue_button.pack(pady=8)
+
+
+    return_button = tk.Button(
+        transaction_window,
+        text="Return Book",
+        width=30,
+        height=2,
+        command=open_return_book
+    )
+    return_button.pack(pady=8)
+
+
+    view_button = tk.Button(
+        transaction_window,
+        text="View All Transactions",
+        width=30,
+        height=2,
+        command=open_view_transactions
+    )
+    view_button.pack(pady=8)
+
+
+    member_history_button = tk.Button(
+        transaction_window,
+        text="Member Transaction History",
+        width=30,
+        height=2
+    )
+    member_history_button.pack(pady=8)
+
+
+    book_history_button = tk.Button(
+        transaction_window,
+        text="Book Transaction History",
+        width=30,
+        height=2
+    )
+    book_history_button.pack(pady=8)
+
+
+    overdue_button = tk.Button(
+        transaction_window,
+        text="Overdue Books",
+        width=30,
+        height=2
+    )
+    overdue_button.pack(pady=8)
+
+
+    issued_button = tk.Button(
+        transaction_window,
+        text="Currently Issued Books",
+        width=30,
+        height=2
+    )
+    issued_button.pack(pady=8)
+
+
+    fine_button = tk.Button(
+        transaction_window,
+        text="Fine Reports",
+        width=30,
+        height=2
+    )
+    fine_button.pack(pady=8)
+
+
+    close_button = tk.Button(
+        transaction_window,
+        text="Close",
+        width=20,
+        command=transaction_window.destroy
+    )
+    close_button.pack(pady=15)
 
 def start_application():
 
@@ -920,7 +1423,8 @@ def start_application():
         root,
         text="Transaction Management",
         width=25,
-        height=2
+        height=2,
+        command=open_transaction_management
     )
 
     transaction_button.pack(pady=10)
