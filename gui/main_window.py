@@ -1287,6 +1287,201 @@ def open_view_transactions():
             )
         )
 
+def open_member_transaction_history():
+
+    history_window = tk.Toplevel()
+    history_window.title("Member Transaction History")
+    history_window.geometry("1000x550")
+
+    title_label = tk.Label(
+        history_window,
+        text="Member Transaction History",
+        font=("Arial", 20, "bold")
+    )
+    title_label.pack(pady=20)
+
+    member_id_label = tk.Label(
+        history_window,
+        text="Member ID"
+    )
+    member_id_label.pack(pady=5)
+
+    member_id_entry = tk.Entry(
+        history_window,
+        width=35
+    )
+    member_id_entry.pack(pady=5)
+
+    def search_member_transactions():
+
+        member_id = member_id_entry.get()
+
+        transactions = get_member_transactions(member_id)
+
+        tree = ttk.Treeview(
+            history_window,
+            columns=(
+                "id",
+                "book_id",
+                "member_id",
+                "issue_date",
+                "due_date",
+                "return_date",
+                "fine",
+                "status"
+            ),
+            show="headings"
+        )
+
+        tree.heading("id", text="Transaction ID")
+        tree.heading("book_id", text="Book ID")
+        tree.heading("member_id", text="Member ID")
+        tree.heading("issue_date", text="Issue Date")
+        tree.heading("due_date", text="Due Date")
+        tree.heading("return_date", text="Return Date")
+        tree.heading("fine", text="Fine")
+        tree.heading("status", text="Status")
+
+        tree.column("id", width=100)
+        tree.column("book_id", width=100)
+        tree.column("member_id", width=100)
+        tree.column("issue_date", width=120)
+        tree.column("due_date", width=120)
+        tree.column("return_date", width=120)
+        tree.column("fine", width=80)
+        tree.column("status", width=100)
+
+        tree.pack(
+            fill="both",
+            expand=True,
+            padx=20,
+            pady=10
+        )
+
+        for transaction in transactions:
+
+            tree.insert(
+                "",
+                tk.END,
+                values=(
+                    transaction[0],
+                    transaction[1],
+                    transaction[2],
+                    transaction[3],
+                    transaction[4],
+                    transaction[5],
+                    transaction[6],
+                    transaction[7]
+                )
+            )
+
+    search_button = tk.Button(
+        history_window,
+        text="View History",
+        width=25,
+        height=2,
+        command=search_member_transactions
+    )
+
+    search_button.pack(pady=20)
+
+def open_book_transaction_history():
+
+    history_window = tk.Toplevel()
+    history_window.title("Book Transaction History")
+    history_window.geometry("1000x550")
+
+    title_label = tk.Label(
+        history_window,
+        text="Book Transaction History",
+        font=("Arial", 20, "bold")
+    )
+    title_label.pack(pady=20)
+
+    book_id_label = tk.Label(
+        history_window,
+        text="Book ID"
+    )
+    book_id_label.pack(pady=5)
+
+    book_id_entry = tk.Entry(
+        history_window,
+        width=35
+    )
+    book_id_entry.pack(pady=5)
+
+    def search_book_transactions():
+
+        book_id = book_id_entry.get()
+
+        transactions = get_book_transactions(book_id)
+
+        tree = ttk.Treeview(
+            history_window,
+            columns=(
+                "id",
+                "book_id",
+                "member_id",
+                "issue_date",
+                "due_date",
+                "return_date",
+                "fine",
+                "status"
+            ),
+            show="headings"
+        )
+
+        tree.heading("id", text="Transaction ID")
+        tree.heading("book_id", text="Book ID")
+        tree.heading("member_id", text="Member ID")
+        tree.heading("issue_date", text="Issue Date")
+        tree.heading("due_date", text="Due Date")
+        tree.heading("return_date", text="Return Date")
+        tree.heading("fine", text="Fine")
+        tree.heading("status", text="Status")
+
+        tree.column("id", width=100)
+        tree.column("book_id", width=100)
+        tree.column("member_id", width=100)
+        tree.column("issue_date", width=120)
+        tree.column("due_date", width=120)
+        tree.column("return_date", width=120)
+        tree.column("fine", width=80)
+        tree.column("status", width=100)
+
+        tree.pack(
+            fill="both",
+            expand=True,
+            padx=20,
+            pady=10
+        )
+
+        for transaction in transactions:
+
+            tree.insert(
+             "",
+                tk.END,
+                values=(
+                 transaction[0],
+                 transaction[1],
+                 transaction[2],
+                 transaction[3],
+                 transaction[4],
+                 transaction[5],
+                 transaction[6],
+                 transaction[7]
+                )
+            )
+
+    search_button = tk.Button(
+        history_window,
+        text="View History",
+        width=25,
+        height=2,
+        command=search_book_transactions
+    )
+
+    search_button.pack(pady=20)
 
 def open_transaction_management():
 
@@ -1335,7 +1530,8 @@ def open_transaction_management():
         transaction_window,
         text="Member Transaction History",
         width=30,
-        height=2
+        height=2,
+        command=open_member_transaction_history
     )
     member_history_button.pack(pady=8)
 
@@ -1344,7 +1540,8 @@ def open_transaction_management():
         transaction_window,
         text="Book Transaction History",
         width=30,
-        height=2
+        height=2,
+        command=open_book_transaction_history
     )
     book_history_button.pack(pady=8)
 
