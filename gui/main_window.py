@@ -1483,6 +1483,215 @@ def open_book_transaction_history():
 
     search_button.pack(pady=20)
 
+def open_overdue_books():
+
+    overdue_window = tk.Toplevel()
+    overdue_window.title("Overdue Books")
+    overdue_window.geometry("1000x500")
+
+    title_label = tk.Label(
+        overdue_window,
+        text="Overdue Books",
+        font=("Arial", 20, "bold")
+    )
+    title_label.pack(pady=20)
+
+    overdue_books = get_overdue_books()
+
+    tree = ttk.Treeview(
+        overdue_window,
+        columns=(
+            "book_id",
+            "title",
+            "member_id",
+            "member_name",
+            "issue_date",
+            "due_date",
+            "status"
+        ),
+        show="headings"
+    )
+    
+    tree.heading("book_id", text="Book ID")
+    tree.heading("title", text="Book Title")
+    tree.heading("member_id", text="Member ID")
+    tree.heading("member_name", text="Member Name")
+    tree.heading("issue_date", text="Issue Date")
+    tree.heading("due_date", text="Due Date")
+    tree.heading("status", text="Status")
+    
+    tree.column("book_id", width=100)
+    tree.column("title", width=180)
+    tree.column("member_id", width=100)
+    tree.column("member_name", width=150)
+    tree.column("issue_date", width=120)
+    tree.column("due_date", width=120)
+    tree.column("status", width=100)
+
+    tree.pack(
+        fill="both",
+        expand=True,
+        padx=20,
+        pady=10
+    )
+
+    for transaction in overdue_books:
+
+        tree.insert(
+            "",
+            tk.END,
+            values=(
+                transaction[0],
+                transaction[1],
+                transaction[2],
+                transaction[3],
+                transaction[4],
+                transaction[5],
+                transaction[6]
+            )
+        )
+
+def open_currently_issued_books():
+
+    issued_window = tk.Toplevel()
+    issued_window.title("Currently Issued Books")
+    issued_window.geometry("1000x500")
+
+    title_label = tk.Label(
+        issued_window,
+        text="Currently Issued Books",
+        font=("Arial", 20, "bold")
+    )
+    title_label.pack(pady=20)
+
+    issued_books = get_currently_issued()
+
+    tree = ttk.Treeview(
+        issued_window,
+        columns=(
+            "book_id",
+            "title",
+            "member_id",
+            "member_name",
+            "issue_date",
+            "due_date",
+            "status"
+        ),
+        show="headings"
+    )
+
+    tree.heading("book_id", text="Book ID")
+    tree.heading("title", text="Book Title")
+    tree.heading("member_id", text="Member ID")
+    tree.heading("member_name", text="Member Name")
+    tree.heading("issue_date", text="Issue Date")
+    tree.heading("due_date", text="Due Date")
+    tree.heading("status", text="Status")
+
+    tree.column("book_id", width=100)
+    tree.column("title", width=180)
+    tree.column("member_id", width=100)
+    tree.column("member_name", width=150)
+    tree.column("issue_date", width=120)
+    tree.column("due_date", width=120)
+    tree.column("status", width=100)
+
+    tree.pack(
+        fill="both",
+        expand=True,
+        padx=20,
+        pady=10
+    )
+
+    for transaction in issued_books:
+
+        tree.insert(
+            "",
+            tk.END,
+            values=(
+             transaction[0],
+             transaction[1],
+             transaction[2],
+             transaction[3],
+             transaction[4],
+             transaction[5],
+             transaction[6]
+            )
+        )
+
+def open_fine_reports():
+
+    fine_window = tk.Toplevel()
+    fine_window.title("Fine Reports")
+    fine_window.geometry("1000x500")
+
+    title_label = tk.Label(
+        fine_window,
+        text="Fine Reports",
+        font=("Arial", 20, "bold")
+    )
+    title_label.pack(pady=20)
+
+    fine_reports = get_fine_report()
+
+    tree = ttk.Treeview(
+        fine_window,
+        columns=(
+            "book_id",
+            "title",
+            "member_id",
+            "member_name",
+            "issue_date",
+            "due_date",
+            "return_date",
+            "fine"
+        ),
+        show="headings"
+    )
+
+    tree.heading("book_id", text="Book ID")
+    tree.heading("title", text="Book Title")
+    tree.heading("member_id", text="Member ID")
+    tree.heading("member_name", text="Member Name")
+    tree.heading("issue_date", text="Issue Date")
+    tree.heading("due_date", text="Due Date")
+    tree.heading("return_date", text="Return Date")
+    tree.heading("fine", text="Fine")
+
+    tree.column("book_id", width=100)
+    tree.column("title", width=180)
+    tree.column("member_id", width=100)
+    tree.column("member_name", width=150)
+    tree.column("issue_date", width=120)
+    tree.column("due_date", width=120)
+    tree.column("return_date", width=120)
+    tree.column("fine", width=100)
+
+    tree.pack(
+        fill="both",
+        expand=True,
+        padx=20,
+        pady=10
+    )
+
+    for report in fine_reports:
+
+        tree.insert(
+            "",
+            tk.END,
+            values=(
+                report[0],
+                report[1],
+                report[2],
+                report[3],
+                report[4],
+                report[5],
+                report[6],
+                report[7]
+            )
+        )
+
+
 def open_transaction_management():
 
     transaction_window = tk.Toplevel()
@@ -1550,7 +1759,8 @@ def open_transaction_management():
         transaction_window,
         text="Overdue Books",
         width=30,
-        height=2
+        height=2,
+        command=open_overdue_books
     )
     overdue_button.pack(pady=8)
 
@@ -1559,7 +1769,8 @@ def open_transaction_management():
         transaction_window,
         text="Currently Issued Books",
         width=30,
-        height=2
+        height=2,
+        command=open_currently_issued_books
     )
     issued_button.pack(pady=8)
 
@@ -1568,7 +1779,8 @@ def open_transaction_management():
         transaction_window,
         text="Fine Reports",
         width=30,
-        height=2
+        height=2,
+        command=open_fine_reports
     )
     fine_button.pack(pady=8)
 
