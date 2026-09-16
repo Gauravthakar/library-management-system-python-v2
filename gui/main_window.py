@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
 from services.book_service import(
     create_book, 
     get_books, 
@@ -80,7 +80,16 @@ def open_add_book():
         title = title_entry.get()
         author = author_entry.get()
         category = category_entry.get()
-        quantity = int(quantity_entry.get())
+
+        if not book_id or not title or not author or not category:
+            messagebox.showerror("Error", "Please fill all fields.")
+            return
+
+        try:
+            quantity = int(quantity_entry.get())
+        except ValueError:
+            messagebox.showerror("Error", "Quantity must be a number.")
+            return
 
         result = create_book(
             book_id,
@@ -91,10 +100,10 @@ def open_add_book():
         )
 
         if result:
-            print("Book added successfully.")
+            messagebox.showinfo("Success", "Book added successfully.")
             add_window.destroy()
         else:
-            print("Failed to add book.")
+            messagebox.showerror("Error", "Failed to add book.")
 
     save_button = tk.Button(
         add_window,
@@ -191,6 +200,10 @@ def open_search_book():
     def search_book():
 
         book_id = book_id_entry.get()
+
+        if not book_id:
+            messagebox.showerror("Error", "Please enter Book ID.")
+            return
 
         book = get_book(book_id)
 
@@ -338,6 +351,10 @@ def open_update_book():
 
         book_id = book_id_entry.get()
 
+        if not book_id:
+            messagebox.showerror("Error", "Please enter Book ID.")
+            return
+
         book = get_book(book_id)
 
         if book:
@@ -356,7 +373,7 @@ def open_update_book():
 
         else:
 
-            print("Book not found.")
+            messagebox.showerror("Error", "Book not found.")
 
     # Search button
     search_button = tk.Button(
@@ -375,7 +392,16 @@ def open_update_book():
         title = book_title_entry.get()
         author = author_entry.get()
         category = category_entry.get()
-        quantity = int(quantity_entry.get())
+
+        if not book_id or not title or not author or not category:
+            messagebox.showerror("Error", "Please fill all fields.")
+            return
+        
+        try:
+            quantity = int(quantity_entry.get())
+        except ValueError:
+            messagebox.showerror("Error", "Quantity must be a number.")
+            return
 
         result = update_book(
             book_id,
@@ -387,13 +413,12 @@ def open_update_book():
 
         if result:
 
-            print("Book updated successfully.")
-
+            messagebox.showinfo("Success", "Book updated successfully.")
             update_window.destroy()
 
         else:
 
-            print("Failed to update book.")
+            messagebox.showerror("Error", "Failed to update book.")
 
     # Update button
     update_button = tk.Button(
@@ -439,17 +464,20 @@ def open_delete_book():
 
         book_id = book_id_entry.get()
 
+        if not book_id:
+            messagebox.showerror("Error", "Please enter Book ID.")
+            return
+
         result = delete_book(book_id)
 
         if result:
 
-            print("Book deleted successfully.")
-
+            messagebox.showinfo("Success", "Book deleted successfully.")
             delete_window.destroy()
 
         else:
 
-            print("Failed to delete book.")
+            messagebox.showerror("Error", "Failed to delete book.")
 
     delete_button = tk.Button(
         delete_window,
