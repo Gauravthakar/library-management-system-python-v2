@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
+
 from services.book_service import(
     create_book, 
     get_books, 
@@ -7,6 +8,7 @@ from services.book_service import(
     update_book, 
     delete_book
 )
+
 from services.member_service import(
     create_member,
     get_members,
@@ -14,6 +16,7 @@ from services.member_service import(
     update_member,
     delete_member
 )
+
 from services.transaction_service import(
     issue_book_to_member,
     return_book_from_member,
@@ -33,13 +36,13 @@ def open_add_book():
     add_window.title("Add Book")
     add_window.geometry("500x600")
 
-    title_lable = tk.Label(
+    title_label = tk.Label(
         add_window,
         text="Add New Book",
         font=("Arial", 20, "bold")
     )
 
-    title_lable.pack(pady=20)
+    title_label.pack(pady=20)
 
     book_id_lable = tk.Label(add_window, text="Book ID")
     book_id_lable.pack()
@@ -122,13 +125,13 @@ def open_view_books():
     view_window.title("View Books")
     view_window.geometry("800x500")
 
-    title_lable = tk.Label(
+    title_label = tk.Label(
         view_window,
         text="All Books",
         font=("Arial", 20, "bold")
     )
 
-    title_lable.pack(pady=20)
+    title_label.pack(pady=20)
 
     books = get_books()
 
@@ -497,13 +500,13 @@ def open_book_management():
     book_window.title("Book Management")
     book_window.geometry("700x500")
 
-    title_lable = tk.Label(
+    title_label = tk.Label(
         book_window,
         text="Book Management",
         font=("Arial", 20, "bold")
     )
 
-    title_lable.pack(pady=30)
+    title_label.pack(pady=30)
 
     add_button = tk.Button(
         book_window,
