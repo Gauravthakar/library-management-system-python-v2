@@ -657,6 +657,10 @@ def open_add_member():
         email = email_entry.get()
         address = address_entry.get()
 
+        if not member_id or not name or not phone or not email or not address:
+            messagebox.showerror("Error", "Please fill all fields.")
+            return
+
         result = create_member(
             member_id,
             name,
@@ -667,13 +671,12 @@ def open_add_member():
 
         if result:
 
-            print("Member added successfully.")
-
+            messagebox.showinfo("Success", "Member added successfully.")
             add_window.destroy()
 
         else:
 
-            print("Failed to add member.")
+            messagebox.showerror("Error", "Failed to add member.")
 
     save_button = tk.Button(
         add_window,
@@ -879,6 +882,10 @@ def open_update_member():
 
         member_id = member_id_entry.get()
 
+        if not member_id:
+            messagebox.showerror("Error", "Please enter Member ID.")
+            return
+
         member = get_member(member_id)
 
         if member:
@@ -897,7 +904,7 @@ def open_update_member():
 
         else:
 
-            print("Member not found.")
+            messagebox.showerror("Error", "Member not found.")
 
     search_button = tk.Button(
         update_window,
@@ -966,6 +973,10 @@ def open_update_member():
         email = email_entry.get()
         address = address_entry.get()
 
+        if not member_id or not name or not phone or not email or not address:
+            messagebox.showerror("Error", "Please fill all fields.")
+            return
+
         result = update_member(
             member_id,
             name,
@@ -975,10 +986,10 @@ def open_update_member():
         )
 
         if result:
-            print("Member updated successfully.")
+            messagebox.showinfo("Success", "Member updated successfully.")
             update_window.destroy()
         else:
-            print("Failed to update member.")
+            messagebox.showerror("Error", "Failed to update member.")
 
     update_button = tk.Button(
         update_window,
@@ -1021,13 +1032,17 @@ def open_delete_member():
 
         member_id = member_id_entry.get()
 
+        if not member_id:
+            messagebox.showerror("Error", "Please enter Member ID.")
+            return
+
         result = delete_member(member_id)
 
         if result:
-            print("Member deleted successfully.")
+            messagebox.showinfo("Success", "Member deleted successfully.")
             delete_window.destroy()
         else:
-            print("Failed to delete member.")
+            messagebox.showerror("Error", "Failed to delete member.")
 
     delete_button = tk.Button(
         delete_window,
@@ -1158,16 +1173,20 @@ def open_issue_book():
         book_id = book_id_entry.get()
         member_id = member_id_entry.get()
 
+        if not book_id or not member_id:
+            messagebox.showerror("Error", "Please enter Book ID and Member ID.")
+            return
+
         result = issue_book_to_member(
             book_id,
             member_id
         )
 
         if result:
-            print("Book issued successfully.")
+            messagebox.showinfo("Success", "Book issued successfully.")
             issue_window.destroy()
         else:
-            print("Failed to issue book.")
+            messagebox.showerror("Error", "Failed to issue book.")
 
     issue_button = tk.Button(
         issue_window,
@@ -1222,16 +1241,20 @@ def open_return_book():
         book_id = book_id_entry.get()
         member_id = member_id_entry.get()
 
+        if not book_id or not member_id:
+            messagebox.showerror("Error", "Please enter Book ID and Member ID.")
+            return
+
         result = return_book_from_member(
             book_id,
             member_id
         )
 
         if result:
-            print("Book returned successfully.")
+            messagebox.showinfo("Success", "Book returned successfully.")
             return_window.destroy()
         else:
-            print("Failed to return book.")
+            messagebox.showerror("Error", "Failed to return book.")
 
     return_button = tk.Button(
         return_window,
@@ -1344,6 +1367,10 @@ def open_member_transaction_history():
 
         member_id = member_id_entry.get()
 
+        if not member_id:
+            messagebox.showerror("Error", "Please enter Member ID.")
+            return
+
         transactions = get_member_transactions(member_id)
 
         tree = ttk.Treeview(
@@ -1441,6 +1468,10 @@ def open_book_transaction_history():
     def search_book_transactions():
 
         book_id = book_id_entry.get()
+
+        if not book_id:
+            messagebox.showerror("Error", "Please enter Book ID.")
+            return
 
         transactions = get_book_transactions(book_id)
 
